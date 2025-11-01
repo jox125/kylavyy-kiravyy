@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  text-align: center;
+}
+#map {
+  height: 90vh;
+  width: 100%;
+}
+#nearbyBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #f4f0ec;
+  border: 1px solid #ccc;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
