@@ -13,7 +13,9 @@ const translations = {
     seasonal: "hooajaline",
     startLabel: "Algus",
     endLabel: "Lõpp",
-    stopLabel: "Peatus"
+    stopLabel: "Peatus",
+    alongRoute: "Näita marsruudi läheduses",
+    kmSuffix: "km"
   },
   en: {
     routeCreate: "Plan route (click on map)",
@@ -28,9 +30,12 @@ const translations = {
     seasonal: "seasonal",
     startLabel: "Start",
     endLabel: "End",
-    stopLabel: "Stop"
+    stopLabel: "Stop",
+    alongRoute: "Show POIs near route",
+    kmSuffix: "km"
   }
 };
+
 
 //Demo PIO data (kakskeelne)
 const poiData = [
@@ -200,6 +205,11 @@ const poiData = [
 
 let currentLang = localStorage.getItem("appLang") || "et";
 
+let corridorOn = true;        // kas filtreerime marsruudi koridori järgi
+let corridorKm = 5;           // lubatud kõrvalepõige (km)
+let currentRouteLine = null;  // L.Polyline marsruudist
+
+
 // --- Kaart ---
 const map = L.map('map').setView([57.84, 26.99], 9);
 
@@ -220,10 +230,86 @@ document.getElementById("langToggle").onclick = () => {
 document.getElementById('nearbyBtn').onclick = () => {
   map.locate({ setView: true, maxZoom: 13 });
 };
+
+const corridorToggle = document.getElementById('corridorToggle');
+const corridorRange  = document.getElementById('corridorKm');
+const corridorVal    = document.getElementById('corridorKmValue');
+
+corridorToggle.addEventListener('change', () => {
+  corridorOn = corridorToggle.checked;
+  refreshAllCategoryLayers();
+});
+
+corridorRange.addEventListener('input', () => {
+  corridorKm = Number(corridorRange.value);
+  corridorVal.textContent = `${corridorKm} ${translations[currentLang].kmSuffix}`;
+  refreshAllCategoryLayers();
+});
+
 map.on('locationfound', (e) => {
   L.marker(e.latlng).addTo(map).bindPopup(translations[currentLang].youAreHere).openPopup();
   L.circle(e.latlng, { radius: 20000 }).addTo(map);
 });
+
+// Eukleidiline ligikaudne kaugus Leafleti kaardiprojektsioonis (pikslid -> meetrid)
+function distancePointToSegmentMeters(p, a, b) {
+  // p, a, b on LayerPoint'id (pikslites)
+  const atob = b.subtract(a);
+  const atop = p.subtract(a);
+  const len = atob.x*atob.x + atob.y*atob.y;
+  let t = len === 0 ? 0 : (atop.x*atob.x + atop.y*atob.y) / len;
+  t = Math.max(0, Math.min(1, t));
+  const proj = L.point(a.x + atob.x * t, a.y + atob.y * t);
+  const distPx = p.distanceTo(proj);
+  // teisenda pikslid meetriteks praegusel zoomil – võtame skaalaks ~metersPerPixel kaardi keskel
+  const center = map.getCenter();
+  const p1 = map.latLngToLayerPoint(center);
+  const p2 = map.latLngToLayerPoint(L.latLng(center.lat, center.lng + 0.001));
+  const meters = L.latLng(center).distanceTo(L.latLng(center.lat, center.lng + 0.001));
+  const metersPerPixel = meters / p1.distanceTo(p2);
+  return distPx * metersPerPixel;
+}
+
+function distanceToPolylineMeters(latlng, polyline) {
+  if (!polyline) return Infinity;
+  const pts = polyline.getLatLngs(); // array of L.LatLng
+  if (pts.length < 2) return Infinity;
+  const p = map.latLngToLayerPoint(latlng);
+  let min = Infinity;
+  for (let i = 1; i < pts.length; i++) {
+    const a = map.latLngToLayerPoint(pts[i-1]);
+    const b = map.latLngToLayerPoint(pts[i]);
+    const d = distancePointToSegmentMeters(p, a, b);
+    if (d < min) min = d;
+  }
+  return min;
+}
+
+function markerPassesCorridor(m) {
+  if (!corridorOn || !currentRouteLine) return true; // kui pole koridori filtrit või marsruuti, näitame kõiki
+  const d = distanceToPolylineMeters(m.getLatLng(), currentRouteLine);
+  return d <= corridorKm * 1000;
+}
+
+function refreshCategoryLayer(cat) {
+  // ehita kiht uuesti vastavalt koridorifiltrile
+  layerGroups[cat].clearLayers();
+  markersByCategory[cat].forEach(m => {
+    if (markerPassesCorridor(m)) layerGroups[cat].addLayer(m);
+  });
+}
+
+function refreshAllCategoryLayers() {
+  categories.forEach(cat => {
+    if (selectedCategories.has(cat)) {
+      refreshCategoryLayer(cat);
+      if (!map.hasLayer(layerGroups[cat])) map.addLayer(layerGroups[cat]);
+    } else {
+      if (map.hasLayer(layerGroups[cat])) map.removeLayer(layerGroups[cat]);
+    }
+  });
+}
+
 
 // ---------------------------------------------------------------------
 // MARSRUUT: LRM (ilma language:'et')
@@ -251,11 +337,16 @@ const routingControl = L.Routing.control({
 
 routingControl.on('routesfound', (e) => {
   const r = e.routes?.[0];
-  if (!r) return;
+  if (!r) { currentRouteLine = null; return; }
+  // salvesta polügooniline joon (kasutame kauguse arvutamiseks)
+  currentRouteLine = L.polyline(r.coordinates);
+  // kui koridorifilter sees, värskenda nähtavaid POI-sid
+  if (corridorOn) refreshAllCategoryLayers();
   const km = (r.summary.totalDistance / 1000).toFixed(1);
   const min = Math.round(r.summary.totalTime / 60);
   console.log(`Marsruut: ${km} km, ~${min} min`);
 });
+
 
 let routeMode = false;
 const routeModeBtn = document.getElementById('routeModeBtn');
@@ -271,10 +362,13 @@ routeModeBtn.addEventListener('click', () => {
 
 clearRouteBtn.addEventListener('click', () => {
   routingControl.setWaypoints([]);
+  currentRouteLine = null; // <— lisatud
+  if (corridorOn) refreshAllCategoryLayers();
   routeMode = false;
   routeModeBtn.classList.add('primary');
   routeModeBtn.textContent = translations[currentLang].routeCreate;
 });
+
 
 function currentWaypointsLatLng() {
   return routingControl.getWaypoints().map(wp => wp && wp.latLng).filter(Boolean);
@@ -373,14 +467,12 @@ function renderFilters() {
       const isOn = ev.target.checked;
       if (isOn) {
         selectedCategories.add(c);
-        if (layerGroups[c].getLayers().length === 0) {
-          markersByCategory[c].forEach(m => layerGroups[c].addLayer(m));
-        }
+        refreshCategoryLayer(c);
         if (!map.hasLayer(layerGroups[c])) map.addLayer(layerGroups[c]);
       } else {
         selectedCategories.delete(c);
-        if (map.hasLayer(layerGroups[c])) map.removeLayer(layerGroups[c]);
-      }
+        if (map.hasLayer(layerGroups[c])) map.removeLayer(layerGroups[c]);      }
+
       // uuenda toggleAll teksti
       const allOn = categories.every(k => selectedCategories.has(k));
       toggleAllBtn.textContent = allOn ? translations[currentLang].hideAll : translations[currentLang].showAll;
@@ -473,20 +565,22 @@ function setLanguage(lang) {
   localStorage.setItem("appLang", lang);
   const t = translations[lang];
 
-  // Nupud
   document.getElementById("clearRouteBtn").textContent = t.routeClear;
   document.getElementById("nearbyBtn").textContent = t.nearby;
 
-  // Route-nupu tekst (sõltub režiimist)
   const rb = document.getElementById("routeModeBtn");
   rb.textContent = routeMode ? t.routeActive : t.routeCreate;
 
-  // Keelelüliti enda tekst
   document.getElementById("langToggle").textContent = lang === "et" ? "EN" : "ET";
 
-  // Filtrid + popupid
+  // filtrite pealkiri + toggle
   renderFilters();
   renderPOIMarkers();
+
+  // koridoriploki tekstid
+  document.getElementById('corridorLabel').textContent = t.alongRoute;
+  corridorVal.textContent = `${corridorKm} ${t.kmSuffix}`;
 }
+
 
 setLanguage(currentLang);
