@@ -1,17 +1,52 @@
 <!DOCTYPE html>
 <html lang="et">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Külävüü – Kirävüü</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <!-- LRM -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+
+  <!-- Geocoder -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+
+  <!-- MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <h1>Külävüü – Kirävüü</h1>
-  <div id="map"></div>
-  <button id="nearbyBtn">Leia lähedal</button>
 
+  <div id="map"></div>
+
+  <div class="toolbar">
+    <button id="routeModeBtn" class="primary">Loo marsruut (kliki kaardile)</button>
+    <button id="clearRouteBtn">Tühjenda marsruut</button>
+    <button id="nearbyBtn">Leia lähedal</button>
+  </div>
+
+  <!-- Filtripaneel (algul punktid peidus) -->
+  <div id="filterPanel">
+    <div class="filter-header">
+      <span>Huvipunktid</span>
+      <button id="toggleAllBtn" data-state="off">Näita kõiki</button>
+    </div>
+    <div id="filters" class="filters">
+      <!-- checkboxid lisame JS-is dünaamiliselt kategooriate põhjal -->
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
