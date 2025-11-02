@@ -1,3 +1,205 @@
+// --------- Kakskeelsus ---------
+const translations = {
+  et: {
+    routeCreate: "Loo marsruut (kliki kaardile)",
+    routeActive: "Marsruudi režiim: AKTIIVNE (kliki kaardile)",
+    routeClear: "Tühjenda marsruut",
+    nearby: "Leia lähedal",
+    youAreHere: "Sina oled siin",
+    filterTitle: "Huvipunktid",
+    showAll: "Näita kõiki",
+    hideAll: "Peida kõik",
+    addStop: "Lisa peatus marsruudile",
+    seasonal: "hooajaline",
+    startLabel: "Algus",
+    endLabel: "Lõpp",
+    stopLabel: "Peatus"
+  },
+  en: {
+    routeCreate: "Plan route (click on map)",
+    routeActive: "Route mode: ACTIVE (click on map)",
+    routeClear: "Clear route",
+    nearby: "Find nearby",
+    youAreHere: "You are here",
+    filterTitle: "Points of Interest",
+    showAll: "Show all",
+    hideAll: "Hide all",
+    addStop: "Add stop to route",
+    seasonal: "seasonal",
+    startLabel: "Start",
+    endLabel: "End",
+    stopLabel: "Stop"
+  }
+};
+
+//Demo PIO data (kakskeelne)
+const poiData = [
+  {
+    name_et: "Võrumaa muuseum",
+    name_en: "Võru County Museum",
+    desc_et: "Kohalik ajalugu ja kultuur.",
+    desc_en: "Local history and culture.",
+    coords: [57.8427, 27.0068],
+    category: "ajalugu",
+    tags_et: ["muuseum","linn"],
+    tags_en: ["museum","town"]
+  },
+  {
+    name_et: "Suur Munamägi",
+    name_en: "Suur Munamägi",
+    desc_et: "Eesti kõrgeim tipp, vaateplatvorm.",
+    desc_en: "Estonia’s highest peak with a viewing platform.",
+    coords: [57.7262, 27.0589],
+    category: "loodus",
+    tags_et: ["vaade","torn"],
+    tags_en: ["view","tower"]
+  },
+  {
+    name_et: "Seto Talumuuseum",
+    name_en: "Seto Farm Museum",
+    desc_et: "Setomaa traditsiooniline elu.",
+    desc_en: "Traditional Setomaa culture and lifestyle.",
+    coords: [57.8791, 27.5027],
+    category: "ajalugu",
+    tags_et: ["seto","muuseum"],
+    tags_en: ["seto","museum"]
+  },
+  {
+    name_et: "Rõuge Pesapuu vaatetorn",
+    name_en: "Rõuge Pesapuu Observation Tower",
+    desc_et: "Arhitektuurne torn ja vaated.",
+    desc_en: "Architectural tower with panoramic views.",
+    coords: [57.7339, 26.9054],
+    category: "loodus",
+    tags_et: ["vaade"],
+    tags_en: ["view"]
+  },
+  {
+    name_et: "Haanja looduskaitseala",
+    name_en: "Haanja Nature Reserve",
+    desc_et: "Kupliline maastik, matkarajad.",
+    desc_en: "Hummocky landscape and hiking trails.",
+    coords: [57.733, 27.042],
+    category: "loodus",
+    tags_et: ["matk","park"],
+    tags_en: ["hiking","park"]
+  },
+  {
+    name_et: "Obinitsa muuseum",
+    name_en: "Obinitsa Museum",
+    desc_et: "Seto kultuuripärand.",
+    desc_en: "Seto cultural heritage.",
+    coords: [57.8916, 27.5248],
+    category: "kultuur",
+    tags_et: ["seto","pärimuskultuur"],
+    tags_en: ["seto","heritage"]
+  },
+  {
+    name_et: "Värska kuurort",
+    name_en: "Värska Resort",
+    desc_et: "Mineraalvesi ja spa.",
+    desc_en: "Mineral water and spa.",
+    coords: [57.9537, 27.6303],
+    category: "pere",
+    tags_et: ["SPA","lõõgastus"],
+    tags_en: ["spa","relaxation"]
+  },
+  {
+    name_et: "Mooska suitsusaun",
+    name_en: "Mooska Smoke Sauna",
+    desc_et: "Suitsusaunakombestik (UNESCO).",
+    desc_en: "Smoke sauna tradition (UNESCO).",
+    coords: [57.7382, 26.8296],
+    category: "kultuur",
+    tags_et: ["saun","UNESCO"],
+    tags_en: ["sauna","UNESCO"]
+  },
+  {
+    name_et: "Drumlinite vaatepunkt",
+    name_en: "Drumlins Viewpoint",
+    desc_et: "Võrumaa kuppelmaastik.",
+    desc_en: "The hummocky landscape of Võru County.",
+    coords: [57.7735, 26.9885],
+    category: "loodus",
+    tags_et: ["vaade","geo"],
+    tags_en: ["view","geo"]
+  },
+  {
+    name_et: "Navitrolla galerii (Vastseliina)",
+    name_en: "Navitrolla Gallery (Vastseliina)",
+    desc_et: "Kohalik kunst.",
+    desc_en: "Local art.",
+    coords: [57.7278, 27.2916],
+    category: "kultuur",
+    tags_et: ["kunst","galerii"],
+    tags_en: ["art","gallery"]
+  },
+  {
+    name_et: "Vastseliina piiskopilinnuse varemed",
+    name_en: "Ruins of Vastseliina Bishop’s Castle",
+    desc_et: "Keskaegne linnus.",
+    desc_en: "Medieval castle ruins.",
+    coords: [57.7297, 27.3208],
+    category: "ajalugu",
+    tags_et: ["linnus","varemed"],
+    tags_en: ["castle","ruins"]
+  },
+  {
+    name_et: "Rõuge Ööbikuorg",
+    name_en: "Rõuge Nightingale Valley",
+    desc_et: "Sügav org, jalutusrajad.",
+    desc_en: "Deep valley with walking trails.",
+    coords: [57.7312, 26.9078],
+    category: "loodus",
+    tags_et: ["org","matk"],
+    tags_en: ["valley","hiking"]
+  },
+  {
+    name_et: "Seto Kostipäev (sündmuspaik)",
+    name_en: "Seto Food Feast (event venue)",
+    desc_et: "Trad. toidufestival (hooajaline).",
+    desc_en: "Traditional food festival (seasonal).",
+    coords: [57.884, 27.53],
+    category: "kultuur",
+    tags_et: ["sündmus","toit"],
+    tags_en: ["event","food"],
+    seasonal: true
+  },
+  {
+    name_et: "Võru linna promenaad",
+    name_en: "Võru City Promenade",
+    desc_et: "Järveäärne jalutusala.",
+    desc_en: "Lakeside promenade.",
+    coords: [57.8449, 27.0087],
+    category: "pere",
+    tags_et: ["jalutus","järv"],
+    tags_en: ["walk","lake"]
+  },
+  {
+    name_et: "Kohalik suitsukalapood",
+    name_en: "Local Smoked Fish Shop",
+    desc_et: "Kohalik toit ja suitsukala.",
+    desc_en: "Local food and smoked fish.",
+    coords: [57.95, 27.2],
+    category: "toit",
+    tags_et: ["kala","kohalik"],
+    tags_en: ["fish","local"]
+  },
+  {
+    name_et: "Kultuurimaja (kontserdid)",
+    name_en: "Cultural Centre (concerts)",
+    desc_et: "Õhtused sündmused.",
+    desc_en: "Evening events.",
+    coords: [57.85, 27.01],
+    category: "kultuur",
+    tags_et: ["kontsert","sündmus"],
+    tags_en: ["concert","event"]
+  }
+];
+
+
+let currentLang = localStorage.getItem("appLang") || "et";
+
 // --- Kaart ---
 const map = L.map('map').setView([57.84, 26.99], 9);
 
@@ -8,17 +210,23 @@ L.tileLayer('https://tiles.maaamet.ee/tm/tms/1.0.0/kaart@GMC/{z}/{x}/{y}.png', {
   attribution: '© Maa-amet'
 }).addTo(map);
 
+// Keele lüliti
+document.getElementById("langToggle").onclick = () => {
+  const newLang = currentLang === "et" ? "en" : "et";
+  setLanguage(newLang);
+};
+
 // --- "Leia lähedal" ---
 document.getElementById('nearbyBtn').onclick = () => {
   map.locate({ setView: true, maxZoom: 13 });
 };
 map.on('locationfound', (e) => {
-  L.marker(e.latlng).addTo(map).bindPopup("Sina oled siin").openPopup();
+  L.marker(e.latlng).addTo(map).bindPopup(translations[currentLang].youAreHere).openPopup();
   L.circle(e.latlng, { radius: 20000 }).addTo(map);
 });
 
 // ---------------------------------------------------------------------
-// MARSRUUT: LRM (ilma language: 'et', et viga ei tekiks)
+// MARSRUUT: LRM (ilma language:'et')
 // ---------------------------------------------------------------------
 const geocoder = (L.Control && L.Control.Geocoder && L.Control.Geocoder.nominatim)
   ? L.Control.Geocoder.nominatim()
@@ -35,7 +243,8 @@ const routingControl = L.Routing.control({
   fitSelectedRoutes: true,
   show: true,
   createMarker: function(i, wp, nWps) {
-    const label = (i === 0) ? 'Algus' : (i === nWps - 1) ? 'Lõpp' : `Stop ${i}`;
+    const t = translations[currentLang];
+    const label = (i === 0) ? t.startLabel : (i === nWps - 1) ? t.endLabel : `${t.stopLabel} ${i}`;
     return L.marker(wp.latLng, { draggable: true }).bindPopup(label, { closeButton: false });
   }
 }).addTo(map);
@@ -56,15 +265,17 @@ routeModeBtn.addEventListener('click', () => {
   routeMode = !routeMode;
   routeModeBtn.classList.toggle('primary', routeMode);
   routeModeBtn.textContent = routeMode
-    ? 'Marsruudi režiim: AKTIIVNE (kliki kaardile)'
-    : 'Loo marsruut (kliki kaardile)';
+    ? translations[currentLang].routeActive
+    : translations[currentLang].routeCreate;
 });
+
 clearRouteBtn.addEventListener('click', () => {
   routingControl.setWaypoints([]);
   routeMode = false;
   routeModeBtn.classList.add('primary');
-  routeModeBtn.textContent = 'Loo marsruut (kliki kaardile)';
+  routeModeBtn.textContent = translations[currentLang].routeCreate;
 });
+
 function currentWaypointsLatLng() {
   return routingControl.getWaypoints().map(wp => wp && wp.latLng).filter(Boolean);
 }
@@ -76,35 +287,9 @@ map.on('click', (e) => {
 });
 
 // ---------------------------------------------------------------------
-// HUVIPUNKTID (demo): kategooriad + tagid + filtrid + klastrid
+// HUVIPUNKTID: (kakskeelne) – eeldan, et poiData on defineeritud eraldi failis
+// või sama faili ülaosas. Kui see on allpool, tõsta see siia kohale.
 // ---------------------------------------------------------------------
-
-/**
- * Kategooriad:
- * - 'ajalugu' (muuseumid, pärand)
- * - 'loodus' (mäed, järved, matkarajad)
- * - 'kultuur' (seto/õhtu/käsitöö)
- * - 'pere' (lastega sobiv)
- * - 'toit' (kohalik söök/jook)
- */
-const poiData = [
-  { name: "Võrumaa muuseum", coords: [57.8427, 27.0068], desc: "Kohalik ajalugu ja kultuur.", category: "ajalugu", tags: ["muuseum","linn"] },
-  { name: "Suur Munamägi", coords: [57.7262, 27.0589], desc: "Eesti kõrgeim tipp, vaateplatvorm.", category: "loodus", tags: ["vaade","torn"] },
-  { name: "Seto Talumuuseum", coords: [57.8791, 27.5027], desc: "Setomaa traditsiooniline elu.", category: "ajalugu", tags: ["seto","muuseum"] },
-  { name: "Rouge Pesapuu vaatetorn", coords: [57.7339, 26.9054], desc: "Arhitektuurne torn ja vaated.", category: "loodus", tags: ["vaade"] },
-  { name: "Haanja looduskaitseala", coords: [57.733, 27.042], desc: "Kupliline maastik, matkarajad.", category: "loodus", tags: ["matk","park"] },
-  { name: "Obinitsa muuseum", coords: [57.8916, 27.5248], desc: "Seto kultuuripärand.", category: "kultuur", tags: ["seto","pärimuskultuur"] },
-  { name: "Värska kuurort", coords: [57.9537, 27.6303], desc: "Mineraalvesi ja spa.", category: "pere", tags: ["SPA","lõõgastus"] },
-  { name: "Mooska suitsusaun", coords: [57.7382, 26.8296], desc: "Suitsusaunakombestik (UNESCO).", category: "kultuur", tags: ["saun","UNESCO"] },
-  { name: "Drumlinite vaatepunkt", coords: [57.7735, 26.9885], desc: "Võrumaa kuppelmaastik.", category: "loodus", tags: ["vaade","geo"] },
-  { name: "Navitrolla galerii (Vastseliina)", coords: [57.7278, 27.2916], desc: "Kohalik kunst.", category: "kultuur", tags: ["kunst","galerii"] },
-  { name: "Vastseliina piiskopilinnuse varemed", coords: [57.7297, 27.3208], desc: "Keskaegne linnus.", category: "ajalugu", tags: ["linnus","varemed"] },
-  { name: "Rõuge Ööbikuorg", coords: [57.7312, 26.9078], desc: "Sügav org, jalutusrajad.", category: "loodus", tags: ["org","matk"] },
-  { name: "Seto Kostipäev (sündmuspaik)", coords: [57.884, 27.53], desc: "Trad. toidufestival (hooajaline).", category: "kultuur", tags: ["sündmus","toit"], seasonal: true },
-  { name: "Võru linna promenaad", coords: [57.8449, 27.0087], desc: "Järveäärne jalutusala.", category: "pere", tags: ["jalutus","järv"] },
-  { name: "Kohalik suitsukalapood", coords: [57.95, 27.2], desc: "Kohalik toit ja suitsukala.", category: "toit", tags: ["kala","kohalik"] },
-  { name: "Kultuurimaja (kontserdid)", coords: [57.85, 27.01], desc: "Õhtused sündmused.", category: "kultuur", tags: ["kontsert","sündmus"] },
-];
 
 // Kategooriad -> klastrikihid
 const categories = [...new Set(poiData.map(p => p.category))];
@@ -115,28 +300,35 @@ categories.forEach(cat => {
   markersByCategory[cat] = [];
 });
 
-// Loo markerid, ÄRÄ lisa veel kaardile (algul peidetud)
+// Loo markerid ÜKS KORD, ära lisa veel kaardile (algul peidetud)
 poiData.forEach(p => {
-  const m = L.marker(p.coords).bindPopup(popupHtml(p));
-  // Lisa “Lisa peatus marsruudile” nupp
-  m.on('popupopen', () => {
-    const btn = document.getElementById('add-stop-btn');
+  const m = L.marker(p.coords);
+  m._poi = p; // talletame viite, et ei peaks hiljem koordinaate võrdlema
+  m.bindPopup(popupHtml(p));
+  m.on('popupopen', (e) => {
+    const el = e.popup.getElement();
+    const btn = el && el.querySelector('.add-stop-btn');
     if (btn) btn.onclick = () => addStopToRoute(p.coords);
   });
   markersByCategory[p.category].push(m);
 });
 
-// Abi: popup HTML
+// Keelesõbralik popup
 function popupHtml(p) {
-  const tagList = p.tags?.length ? `<div class="badge">${p.tags.join('</div><div class="badge">')}</div>` : '';
-  const season = p.seasonal ? `<div class="badge">hooajaline</div>` : '';
+  const name = currentLang === "et" ? p.name_et : p.name_en;
+  const desc = currentLang === "et" ? p.desc_et : p.desc_en;
+  const addStopTxt = translations[currentLang].addStop;
+  const tags = (currentLang === "et" ? p.tags_et : p.tags_en) || [];
+  const tagList = tags.length ? `<div class="badge">${tags.join('</div><div class="badge">')}</div>` : '';
+  const season = p.seasonal ? `<div class="badge">${translations[currentLang].seasonal}</div>` : '';
+
   return `
-    <b>${p.name}</b><br/>
-    ${p.desc}<br/>
+    <b>${name}</b><br/>
+    ${desc}<br/>
     <div style="margin:6px 0">${tagList}${season}</div>
-    <button id="add-stop-btn" style="
+    <button class="add-stop-btn" style="
       margin-top:6px;padding:6px 10px;border:1px solid #d3d3d3;border-radius:8px;background:#f7f7f7;cursor:pointer;">
-      Lisa peatus marsruudile
+      ${addStopTxt}
     </button>
   `;
 }
@@ -151,77 +343,150 @@ function addStopToRoute(latlngArr) {
 // -------- Filtripaneel (checkboxid, loendurid) --------
 const filtersDiv = document.getElementById('filters');
 const toggleAllBtn = document.getElementById('toggleAllBtn');
+// Hetkel sisse lülitatud kategooriad
+const selectedCategories = new Set();
 
-// Loo checkbox’id + loendurid
-categories.forEach(cat => {
-  const count = markersByCategory[cat].length;
-  const id = `filter-${cat}`;
-  const label = document.createElement('label');
-  label.innerHTML = `
-    <input type="checkbox" id="${id}" data-cat="${cat}" />
-    <span>${prettyCat(cat)}</span>
-    <small>${count}</small>
-  `;
-  filtersDiv.appendChild(label);
+function renderFilters() {
+  // säilita valikud
+  const prev = new Set(selectedCategories);
+  selectedCategories.clear();
+  prev.forEach(c => selectedCategories.add(c));
 
-  // Käitumine: lisab/eemaldab kihi kaardilt
-  label.querySelector('input').addEventListener('change', (ev) => {
-    const c = ev.target.dataset.cat;
-    const checked = ev.target.checked;
-    if (checked) {
-      // lisa markerid kihti (kui mitte veel lisatud)
-      if (layerGroups[c].getLayers().length === 0) {
-        markersByCategory[c].forEach(m => layerGroups[c].addLayer(m));
+  // puhasta ja loo uuesti
+  filtersDiv.innerHTML = "";
+  categories.forEach(cat => {
+    const count = markersByCategory[cat].length;
+    const id = `filter-${cat}`;
+    const label = document.createElement('label');
+    const checked = prev.has(cat);
+
+    label.innerHTML = `
+      <input type="checkbox" id="${id}" data-cat="${cat}" ${checked ? "checked" : ""}/>
+      <span>${prettyCat(cat)}</span>
+      <small>${count}</small>
+    `;
+    filtersDiv.appendChild(label);
+
+    const input = label.querySelector('input');
+    input.addEventListener('change', (ev) => {
+      const c = ev.target.dataset.cat;
+      const isOn = ev.target.checked;
+      if (isOn) {
+        selectedCategories.add(c);
+        if (layerGroups[c].getLayers().length === 0) {
+          markersByCategory[c].forEach(m => layerGroups[c].addLayer(m));
+        }
+        if (!map.hasLayer(layerGroups[c])) map.addLayer(layerGroups[c]);
+      } else {
+        selectedCategories.delete(c);
+        if (map.hasLayer(layerGroups[c])) map.removeLayer(layerGroups[c]);
       }
-      map.addLayer(layerGroups[c]);
-    } else {
-      map.removeLayer(layerGroups[c]);
+      // uuenda toggleAll teksti
+      const allOn = categories.every(k => selectedCategories.has(k));
+      toggleAllBtn.textContent = allOn ? translations[currentLang].hideAll : translations[currentLang].showAll;
+      toggleAllBtn.setAttribute('data-state', allOn ? 'on' : 'off');
+    });
+
+    // kui oli varem valitud, lülita kohe sisse
+    if (checked) {
+      if (layerGroups[cat].getLayers().length === 0) {
+        markersByCategory[cat].forEach(m => layerGroups[cat].addLayer(m));
+      }
+      if (!map.hasLayer(layerGroups[cat])) map.addLayer(layerGroups[cat]);
     }
   });
-});
 
-// “Näita kõiki / Peida kõik”
+  // pealkiri ja toggle nupp
+  document.querySelector("#filterPanel .filter-header span").textContent = translations[currentLang].filterTitle;
+  const allOn = categories.every(k => selectedCategories.has(k));
+  toggleAllBtn.textContent = allOn ? translations[currentLang].hideAll : translations[currentLang].showAll;
+  toggleAllBtn.setAttribute('data-state', allOn ? 'on' : 'off');
+}
+
+// "Näita kõiki / Peida kõik"
 toggleAllBtn.addEventListener('click', () => {
-  const state = toggleAllBtn.getAttribute('data-state'); // off -> peidus
-  const inputs = filtersDiv.querySelectorAll('input[type="checkbox"]');
+  const turnOn = toggleAllBtn.getAttribute('data-state') === 'off';
 
-  if (state === 'off') {
-    // Näita kõiki
-    inputs.forEach(inp => {
-      if (!inp.checked) inp.checked = true;
-      const c = inp.dataset.cat;
+  selectedCategories.clear();
+  if (turnOn) categories.forEach(c => selectedCategories.add(c));
+
+  // checkboxid + kihid
+  filtersDiv.querySelectorAll('input[type="checkbox"]').forEach(inp => {
+    inp.checked = turnOn;
+    const c = inp.dataset.cat;
+    if (turnOn) {
       if (layerGroups[c].getLayers().length === 0) {
         markersByCategory[c].forEach(m => layerGroups[c].addLayer(m));
       }
       if (!map.hasLayer(layerGroups[c])) map.addLayer(layerGroups[c]);
-    });
-    toggleAllBtn.textContent = 'Peida kõik';
-    toggleAllBtn.setAttribute('data-state', 'on');
-  } else {
-    // Peida kõik
-    inputs.forEach(inp => {
-      if (inp.checked) inp.checked = false;
-      const c = inp.dataset.cat;
+    } else {
       if (map.hasLayer(layerGroups[c])) map.removeLayer(layerGroups[c]);
-    });
-    toggleAllBtn.textContent = 'Näita kõiki';
-    toggleAllBtn.setAttribute('data-state', 'off');
-  }
+    }
+  });
+
+  toggleAllBtn.textContent = turnOn ? translations[currentLang].hideAll : translations[currentLang].showAll;
+  toggleAllBtn.setAttribute('data-state', turnOn ? 'on' : 'off');
 });
 
-// Inimhõlbus nimi
+// Inimhõlbus kategooria nimi
 function prettyCat(cat) {
-  switch (cat) {
-    case 'ajalugu': return 'Ajalugu & muuseumid';
-    case 'loodus':  return 'Loodus & vaated';
-    case 'kultuur': return 'Kultuur & sündmused';
-    case 'pere':    return 'Pere & lõõgastus';
-    case 'toit':    return 'Kohalik toit';
-    default: return cat;
-  }
+  // Kui sul on eraldi translations.categories, võid kasutada seda.
+  // Siin on lihtne fallback: kasuta ET/EN üldpealkirju ülal või jäta cat.
+  // (Vajadusel lisa categories-tõlked translations-objekti.)
+  // Kuna sa juba näitasid kategooriate tõlkeid eraldi plokis, saate soovi korral laiendada.
+  return ({
+    et: {
+      ajalugu: "Ajalugu & muuseumid",
+      loodus:  "Loodus & vaated",
+      kultuur: "Kultuur & sündmused",
+      pere:    "Pere & lõõgastus",
+      toit:    "Kohalik toit"
+    },
+    en: {
+      ajalugu: "History & Museums",
+      loodus:  "Nature & Views",
+      kultuur: "Culture & Events",
+      pere:    "Family & Relax",
+      toit:    "Local Food"
+    }
+  })[currentLang][cat] || cat;
+}
+
+// Uuenda kõikide markerite popupid aktiivse keele järgi
+function renderPOIMarkers() {
+  categories.forEach(cat => {
+    markersByCategory[cat].forEach(m => {
+      const p = m._poi;
+      if (p) m.setPopupContent(popupHtml(p));
+    });
+  });
 }
 
 // --- Vea logi
 window.addEventListener('error', (ev) => {
   console.error('JS viga:', ev.message);
 });
+
+// Keel ja UI algseis
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem("appLang", lang);
+  const t = translations[lang];
+
+  // Nupud
+  document.getElementById("clearRouteBtn").textContent = t.routeClear;
+  document.getElementById("nearbyBtn").textContent = t.nearby;
+
+  // Route-nupu tekst (sõltub režiimist)
+  const rb = document.getElementById("routeModeBtn");
+  rb.textContent = routeMode ? t.routeActive : t.routeCreate;
+
+  // Keelelüliti enda tekst
+  document.getElementById("langToggle").textContent = lang === "et" ? "EN" : "ET";
+
+  // Filtrid + popupid
+  renderFilters();
+  renderPOIMarkers();
+}
+
+setLanguage(currentLang);
